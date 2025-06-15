@@ -1,36 +1,32 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import supabase from '@/lib/supabase';
 
 export async function POST(req) {
-  try {
-    const body = await req.json();
+  const body = await req.json();
 
-    const { content, post_url, author_name, likes, comments } = body;
+  // ✅ Log incoming body
+  console.log('📨 Received from PhantomBuster:', JSON.stringify(body, null, 2));
 
-    const { error } = await supabase.from('posts').insert([
-      {
-        content,
-        post_url,
-        author_name,
-        likes,
-        comments,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+  const { content, post_url, author_name, likes, comments } = body;
 
-    if (error) {
-      console.error('Supabase insert error:', error.message);
-      return NextResponse.json({ success: false, error: error.message });
-    }
+  // ✅ Log destructured values
+  console.log('🧩 Parsed values:', { content, post_url, author_name, likes, comments });
 
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error('Webhook error:', err.message);
-    return NextResponse.json({ success: false, error: 'Invalid request' });
+  const { error } = await supabase.from('posts').insert([
+    {
+      content,
+      post_url,
+      author_name,
+      likes,
+      comments,
+      post_date: new Date().toISOString(),
+    },
+  ]);
+
+  if (error) {
+    console.error('❌ Supabase insert error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  return NextResponse.json({ success: true });
 }
