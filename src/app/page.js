@@ -11,7 +11,6 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-// ✅ This export is required for App Router metadata to work correctly
 export const metadata = {
   title: 'LinkedIn Listener',
   description: 'Auto-track LinkedIn posts & generate GPT replies',
